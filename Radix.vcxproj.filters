@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="test-data">
+      <UniqueIdentifier>{6b20bfb0-4e69-454e-a32d-d8e0e6c34bf4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test-data\comand-arguments">
+      <UniqueIdentifier>{73ad4a67-386f-495b-86fd-548c040d155b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test-data\comand-arguments\radix">
+      <UniqueIdentifier>{d61f4d2b-2ab6-4191-a6c3-d66bc475f5dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test-data\comand-arguments\argument-count">
+      <UniqueIdentifier>{13dbd69e-0cc9-4fd4-95b7-a12b019088f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test-data\comand-arguments\input-value">
+      <UniqueIdentifier>{f711071c-1835-47f2-81bb-e577087bca49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test-data\comand-arguments\converter">
+      <UniqueIdentifier>{84464a8c-6272-4427-9e5f-699fd39a9861}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Radix.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Translator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test.bat">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Translator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="invalid-argumenst-output.txt">
+      <Filter>test-data\comand-arguments\argument-count</Filter>
+    </Text>
+    <Text Include="mixed-radix-output.txt">
+      <Filter>test-data\comand-arguments\radix</Filter>
+    </Text>
+    <Text Include="non-numeric-radix-output.txt">
+      <Filter>test-data\comand-arguments\radix</Filter>
+    </Text>
+    <Text Include="radix-out-of-range-output.txt">
+      <Filter>test-data\comand-arguments\radix</Filter>
+    </Text>
+    <Text Include="invalid-both-radix-output.txt">
+      <Filter>test-data\comand-arguments\radix</Filter>
+    </Text>
+    <Text Include="overflow-low-border-output.txt">
+      <Filter>test-data\comand-arguments\input-value</Filter>
+    </Text>
+    <Text Include="overflow-high-border-output.txt">
+      <Filter>test-data\comand-arguments\input-value</Filter>
+    </Text>
+    <Text Include="invalid-symbol-in-radix.txt">
+      <Filter>test-data\comand-arguments\input-value</Filter>
+    </Text>
+    <Text Include="sign-only-output.txt">
+      <Filter>test-data\comand-arguments\input-value</Filter>
+    </Text>
+    <Text Include="high-border-output.txt">
+      <Filter>test-data\comand-arguments\converter</Filter>
+    </Text>
+    <Text Include="low-border-output.txt">
+      <Filter>test-data\comand-arguments\converter</Filter>
+    </Text>
+    <Text Include="invalid-destination-output.txt">
+      <Filter>test-data\comand-arguments\radix</Filter>
+    </Text>
+    <Text Include="borders-notation-output.txt">
+      <Filter>test-data\comand-arguments\converter</Filter>
+    </Text>
+    <Text Include="zero-output.txt">
+      <Filter>test-data\comand-arguments\converter</Filter>
+    </Text>
+    <Text Include="zero-first-output.txt">
+      <Filter>test-data\comand-arguments\converter</Filter>
+    </Text>
+    <Text Include="invalid-value-in-one-radix-output.txt">
+      <Filter>test-data\comand-arguments\input-value</Filter>
+    </Text>
+    <Text Include="in-one-radix-output.txt">
+      <Filter>test-data\comand-arguments\input-value</Filter>
+    </Text>
+    <Text Include="overflow-multiply-high-border-output.txt">
+      <Filter>test-data\comand-arguments\input-value</Filter>
+    </Text>
+    <Text Include="overflow-multiply-low-border-output.txt">
+      <Filter>test-data\comand-arguments\input-value</Filter>
+    </Text>
+    <Text Include="empty-value-output.txt">
+      <Filter>test-data\comand-arguments\input-value</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
