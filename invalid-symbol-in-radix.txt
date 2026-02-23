@@ -1,1 +1,2 @@
-Invalid character 'A' in '123A' in 10-notation
+Invalid value:
+The value has invalid characters in source notation

@@ -1,3 +1,2 @@
-Invalid character 'a' in '10ab' in 10-notation
-The radix must be an integer in the range from 2 to 36 inclusive
-Invalid source notation
+Invalid source notation:
+The value has invalid characters in source notation

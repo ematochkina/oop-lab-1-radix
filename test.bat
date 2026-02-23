@@ -67,7 +67,7 @@ rem ожидаем оповещение об ошибках в обоих системах счисления
 fc.exe %TEMP%\invalid-both-radix-output.txt invalid-both-radix-output.txt
 if ERRORLEVEL 1 goto err
 
-rem ожидаем ненулевой код ошибки при запускеc пустым числом
+ожидаем ненулевой код ошибки при запуске c пустым числом
 %PROGRAM% 10 16 "" > %TEMP%\empty-value-output.txt
 if NOT ERRORLEVEL 1 goto err
 fc.exe %TEMP%\empty-value-output.txt empty-value-output.txt

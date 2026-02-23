@@ -2,107 +2,187 @@
 #include <array>
 #include <iostream>
 #include <limits>
+#include <vector>
+#include <algorithm>
+#include <cctype>
 
 namespace
 {
 
-const std::array<char, 36> alphabet = {
-	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-	'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-	'U', 'V', 'W', 'X', 'Y', 'Z'
+const int code9 = static_cast<int>('9');
+const int codeA = static_cast<int>('A');
+
+struct DigitsView
+{
+	bool hasInvalidSymbols = false;
+	std::vector<size_t> digits;
+	bool isSigned = false;
+	bool isNegative = false;
+
+	bool IsEmpty() const
+	{
+		return digits.empty();
+	}
 };
 
-const int minNotation = 2;
-const int maxNotation = alphabet.size();
-
+bool IsRadixOutOfRange(int radix)
+{
+	return radix < MinNotation || radix > MaxNotation;
 }
 
-int StringToInt(const std::string& str, int radix, bool& wasError)
+bool IsDigitSymbol(char symbol)
 {
-	wasError = true;
+	return symbol >= '0' && symbol <= '9';
+}
 
+bool IsUpperAlphabetSymbol(char symbol)
+{
+	return symbol >= 'A' && symbol <= 'Z';
+}
+
+size_t CharToDigitByRadix(char element, int radix, bool& outOfRange)
+{
+	element = std::toupper(element);
+
+	const size_t value = IsDigitSymbol(element) 
+		? element - '0' 
+		: IsUpperAlphabetSymbol(element) 
+		? (element - 'A') + 10
+		: MaxNotation;
+	outOfRange = value >= radix;
+
+	return outOfRange ? 0 : value;
+}
+
+char DigitToChar(size_t digit)
+{
+	return digit < 10 ? '0' + digit : 'A' + (digit - 10);
+}
+
+DigitsView GetDigitsView(const std::string& str, int radix)
+{
+	DigitsView info;
 	if (str.empty())
 	{
-		std::cout << "No value specified\n";
-		return 0;
+		return info;
 	}
 
-	if (radix < minNotation || radix > maxNotation)
+	const size_t len = str.length();
+	info.isNegative = str[0] == '-';
+	info.isSigned = info.isNegative || str[0] == '+';
+	if (info.isSigned && len == 1)
 	{
-		std::cout << "The radix must be an integer in the range from 2 to 36 inclusive\n"
-				  << "Invalid source notation\n";
-		return 0;
+		return info;
 	}
 
-	const bool isNegative = str[0] == '-';
-	const bool hasSign = isNegative || str[0] == '+';
-	const size_t symbolCount = str.length();
-	if (hasSign && symbolCount == 1)
+	info.digits.reserve(len);
+	for (size_t i = info.isSigned ? 1 : 0; i < len; i++)
 	{
-		std::cout << "No value specified\n";
-		return 0;
-	}
+		const size_t digit = CharToDigitByRadix(str[i], radix, info.hasInvalidSymbols);
+		if (info.hasInvalidSymbols)
+		{
+			return info;
+		}
 
+		info.digits.push_back(digit);
+	}
+	return info;
+}
+
+int DigitsToValue(const std::vector<size_t>& digits, bool isNegative, int radix, bool& wasOverflow)
+{
+	wasOverflow = false;
 	const int lowBorder = isNegative
 		? std::numeric_limits<int>::min()
 		: -std::numeric_limits<int>::max();
 	const int lowBorderDivRadix = lowBorder / radix;
 	int value = 0;
-	for (size_t i = hasSign ? 1 : 0; i < symbolCount; i++)
+	for (int digit : digits)
 	{
-		auto it = std::find(alphabet.begin(), alphabet.end(), std::toupper(str[i]));
-		const int digit = it == std::end(alphabet) 
-			? -1 
-			: static_cast<int>(it - std::begin(alphabet));
-		if (digit < 0 || digit >= radix)
-		{
-			std::cout << "Invalid character \'" << str[i] << "\'"
-					  << " in \'" << str << "\'"
-					  << " in " << radix << "-notation\n";
-			return 0;
-		}
-
 		if (value < lowBorderDivRadix)
 		{
-			std::cout << "Converting value to decimal with overflow\n";
+			wasOverflow = true;
 			return 0;
 		}
 		value *= radix;
-		
+
 		if (value < lowBorder + digit)
 		{
-			std::cout << "Converting value to decimal with overflow\n";
+			wasOverflow = true;
 			return 0;
 		}
 		value -= digit;
 	}
 
-	wasError = false;
 	return isNegative ? value : std::abs(value);
 }
 
-std::string IntToString(int n, int radix, bool& wasError)
-{
-	wasError = true;
+} // namespace
 
-	if (radix < minNotation || radix > maxNotation)
+bool IsErrorStatus(TranslatorStatus translatorStatus)
+{
+	return translatorStatus != TranslatorStatus::Success;
+}
+
+int StringToInt(const std::string& str, int radix, TranslatorStatus& translatorStatus)
+{
+	translatorStatus = TranslatorStatus::Success;
+
+	if (IsRadixOutOfRange(radix))
 	{
-		std::cout << "The radix must be an integer in the range from 2 to 36 inclusive\n"
-				  << "Invalid destination notation\n";
+		translatorStatus = TranslatorStatus::RadixOutOfRange;
+		return 0;
+	}
+
+	DigitsView valueDigitsView = GetDigitsView(str, radix);
+	if (valueDigitsView.hasInvalidSymbols)
+	{
+		translatorStatus = TranslatorStatus::HasInvalidCharacter;
+		return 0;
+	}
+
+	if (valueDigitsView.IsEmpty())
+	{
+		translatorStatus = TranslatorStatus::ValueNotSpecified;
+		return 0;
+	}
+
+	bool wasOverflow = false;
+	const int value = DigitsToValue(valueDigitsView.digits, valueDigitsView.isNegative, radix, wasOverflow);
+	if (wasOverflow)
+	{
+		translatorStatus = TranslatorStatus::WasOverflow;
+		return 0;
+	}
+	
+	return value;
+}
+
+std::string IntToString(int n, int radix, TranslatorStatus& translatorStatus)
+{
+	translatorStatus = TranslatorStatus::Success;
+
+	if (IsRadixOutOfRange(radix))
+	{
+		translatorStatus = TranslatorStatus::RadixOutOfRange;
 		return "";
 	}
 
 	const bool isNegative = n < 0;
-	std::string str = "";
+	std::string str;
 	do
 	{
 		const int remainder = std::abs(n % radix);
-		str = alphabet[remainder] + str;
+		str.push_back(DigitToChar(remainder));
 		n /= radix;
 	} while (n != 0);
-	
 
-	wasError = false;
-	return isNegative ? '-' + str : str;
+	if (isNegative)
+	{
+		str.push_back('-');
+	}
+
+	std::reverse(str.begin(), str.end());
+
+	return str;
 }

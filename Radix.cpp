@@ -3,49 +3,84 @@
 
 using namespace std;
 
+void PrintUseageFormat()
+{
+	cout << "Usage: radix.exe <source notation> <destination notation> <value>\n";
+}
+
+void ProcessTranslatorErrorStatus(TranslatorStatus translatorStatus)
+{
+	switch (translatorStatus)
+	{
+	case TranslatorStatus::RadixOutOfRange:
+		std::cout << "The radix must be an integer in the range from " << MinNotation
+				  << " to " << MaxNotation << " inclusive\n";
+		break;
+	case TranslatorStatus::HasInvalidCharacter:
+		std::cout << "The value has invalid characters in source notation\n";
+		break;
+	case TranslatorStatus::ValueNotSpecified:
+		std::cout << "No value specified\n";
+		break;
+	case TranslatorStatus::WasOverflow: 
+		std::cout << "Converting value to decimal with overflow\n";
+		break;
+	case TranslatorStatus::Success:
+		break;
+	default:
+		break;
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	if (argc != 4)
 	{
-		cout << "Invalid arguments count\n"
-			 << "Usage: radix.exe <source notation> <destination notation> <value>\n";
+		cout << "Invalid arguments count\n";
+		PrintUseageFormat();
 		return 1;
 	}
 
-	bool wasTo10TranslatorError = false;
-	bool wasSourceError = false;
-	int value10 = 0;
-	const int source = StringToInt(argv[1], 10, wasSourceError);
+	TranslatorStatus sourceTranslatorStatus = TranslatorStatus::Success;
+	const int source = StringToInt(argv[1], 10, sourceTranslatorStatus);
+	const bool wasSourceError = IsErrorStatus(sourceTranslatorStatus);
 	if (wasSourceError)
 	{
-		cout << "The radix must be an integer in the range from 2 to 36 inclusive\n" 
-			<< "Invalid source notation\n";
-	}
-	else
-	{
-		value10 = StringToInt(argv[3], source, wasTo10TranslatorError);
+		cout << "Invalid source notation:\n";
+		ProcessTranslatorErrorStatus(sourceTranslatorStatus);
 	}
 
-	bool wasDestinationError = false;
-	const int destination = StringToInt(argv[2], 10, wasDestinationError);
+	TranslatorStatus valueTranslatorStatus = TranslatorStatus::Success;
+	const int valueDec = wasSourceError ? 0 : StringToInt(argv[3], source, valueTranslatorStatus);
+	const bool wasValueToDecError = IsErrorStatus(valueTranslatorStatus);
+	if (wasValueToDecError)
+	{
+		cout << "Invalid value:\n";
+		ProcessTranslatorErrorStatus(valueTranslatorStatus);
+	}
+
+	TranslatorStatus destinationTranslatorStatus = TranslatorStatus::Success;
+	const int destination = StringToInt(argv[2], 10, destinationTranslatorStatus);
+	const bool wasDestinationError = IsErrorStatus(destinationTranslatorStatus);
 	if (wasDestinationError)
 	{
-		cout << "The radix must be an integer in the range from 2 to 36 inclusive\n" 
-			<< "Invalid destination notation\n";
+		cout << "Invalid destination notation:\n";
+		ProcessTranslatorErrorStatus(destinationTranslatorStatus);
 	}
 
-	if (wasSourceError || wasDestinationError || wasTo10TranslatorError)
+	if (wasSourceError || wasDestinationError || wasValueToDecError)
 	{
 		return 1;
 	}
 
-	bool wasFrom10TranslatorError = false;
-	const std::string valueView = IntToString(value10, destination, wasFrom10TranslatorError);
-	if (wasFrom10TranslatorError)
+	const std::string valueDest = IntToString(valueDec, destination, valueTranslatorStatus);
+	if (IsErrorStatus(valueTranslatorStatus))
 	{
+		cout << "Invalid value:\n";
+		ProcessTranslatorErrorStatus(valueTranslatorStatus);
 		return 1;
 	}
 
-	cout << valueView << std::endl;
+	cout << valueDest << std::endl;
 	return 0;
 }
